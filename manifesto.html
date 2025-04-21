@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: Avenir, sans-serif;
+        color: white;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      body::-webkit-scrollbar {
+        display: none;
+      }
+      html {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        position: relative;
+      }
+
+      html::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("./images/background.png");
+        background-repeat: repeat;
+        opacity: 0.05;
+        z-index: -1;
+      }
+      a {
+        color: white;
+      }
+      .blank-notice {
+        position: fixed;
+        right: 10%;
+        top: 50%;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        text-align: center;
+        font-size: 16px;
+        opacity: 0.8;
+        letter-spacing: 0.2rem;
+        color: rgb(255, 0, 0);
+        text-transform: uppercase;
+      }
+      .symbol-group {
+        font-size: 16px;
+        display: inline-block;
+      }
+      .quote {
+        border-left: 2px solid rgba(255, 255, 255, 0.404);
+        padding-left: 15px;
+      }
+      @media (max-width: 768px) {
+        .blank-notice {
+          display: none;
+        }
+      }
+      .subtext {
+        padding-left: 15px;
+      }
+      .video-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        max-width: 300px;
+      }
+      .video-container video {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="padding-left: 50px; padding-top: 30px; max-width: 400px">
+      <h2>My Design Manifesto (work in progress)</h2>
+      <p>=================================</p>
+      <h3>Preface:</h3>
+      <p>
+        A while back I caught up with my friend
+        <a href="https://x.com/maximecperoumal">Maxime</a> over coffee in San
+        Francisco. At some point the question of
+        <i>"what makes a good designer"</i>
+        was raised, to which my response was:
+      </p>
+      <div class="quote">
+        <p>
+          <i>
+            "someone who's experienced and seen so many similar patterns in a
+            specific problem space that they're able to approach any problem"
+          </i>
+        </p>
+      </div>
+
+      <p>
+        This was a very sterile and naive approach, to
+        <i>"what makes a good designer"</i>, and more importantly, the one I see
+        most designers subconsciously self-ascribe. If this were to be true,
+        then the only thing seperating a good designer from a bad one would be
+        time, and both you and I know that not to be true.
+      </p>
+      <div class="subtext">
+        <p>
+          Are the best pieces of artwork photorealisim because of the time it
+          took to produce?
+          <a href="https://youtu.be/H7So0fhStyI?t=489"><b>No.</b></a>
+        </p>
+        <p>
+          Are the best artists the ones who've been making art the longest?
+          <b>No.</b>
+        </p>
+      </div>
+      <p>So what does make a good designer?</p>
+      <p>
+        Maxime proposed—and after a few modifications from myself—we came to
+        this:
+      </p>
+      <div class="quote">
+        <a href="https://youtu.be/H7So0fhStyI?t=166">
+          <p>
+            <i>
+              "someone who approaches every single aspect of their daily life
+              from a very specific perspective, allowing their experiences to
+              shape, mold, and refine that perspective over time, and in turn
+              influence their work."
+            </i>
+          </p>
+        </a>
+      </div>
+      <div class="subtext">
+        <p>
+          Are the best pieces of artwork the ones with unique styles and
+          perspectives?
+          <a href="https://youtu.be/YKJf876thxw"><b>Yes.</b></a>
+        </p>
+      </div>
+      <p>This is what's traditionally called an artist's "art style."</p>
+      <hr />
+      <h4><a href="https://youtu.be/vSCIUTE6Vs4">Purpose</a></h4>
+      <p>
+        So what's the point of this—all of this? For everyone, I suppose that's
+        unique, and ultimately constitutes the 'meaning of life,' but for me, I
+        keep circling back to this idea of creating things—anything—that when
+        someone looks at what you made, they feel understood, that they feel as
+        if they're not alone in this world, and that there's still hope.
+      </p>
+      <img
+        src="./images/why/1.png"
+        style="max-width: 400px; border: 10px solid white dashed"
+      />
+      <p>
+        Often when I read comments like these, there's a feeling deep inside of
+        me that I can't describe and I don't know what it is. It's something
+        along the lines of a mix of deep profound sadness and incredible
+        gratitude, but not quite.
+      </p>
+
+      <p>
+        There's this fervent voice in my head constantly reminding me of the
+        pain and suffering that exists in the world. It's like a Spotify
+        playlist that I can't stop listening to set on max volume playing 24/7
+        in my eardrums. This feeling in the pits of my stomach that I can't
+        accurately describe serves as a constant reminder as to how incredibly
+        lucky I am to be able to create things that help alleviate that
+        suffering, if even for a moment. What an honor it is, that other people
+        allow me to create for them,,,that my work is what they get to
+        experience to bring them hope, joy, or any feeling that helps them
+        understand and come to terms with this world and their lives.
+      </p>
+
+      <hr />
+      <h4>What I want</h4>
+      <p>
+        When I was in the second grade, we had this thing where after you got
+        your photos taken, you could pay $2 for some ice
+        cream/popsicles/whatever, and there was this kid who wasn't able to get
+        either because his parents didn't pay. I vividly remember feeling
+        something from him; it was pure shame...pure embarrassment, and I could
+        really physically feel it in the pits of my stomach when no one else
+        around me could...or maybe they just didn't care? I remember when I
+        handed him my unopened popsicle, that there was this feeling of just
+        pure warmth that washed over him, and I think in some hedonistic way
+        I've been searching for that feeling again all my life.
+      </p>
+      <p>
+        Give me not superfluous awards for my work, devout believers, praise of
+        the highest form, or even millions of eyes glued to what I've made
+        saying it's of beauty and substance, but give me a single individual
+        whose heart has truly been changed through my work. That is true beauty.
+      </p>
+      <p>
+        Give me a single smile, a heart truly touched and filled with warmth.
+        Give me happiness, give me joy, give me all that which is unable to be
+        ascertained with a heart that searches for beauty purely for the
+        positive external perception of others.
+      </p>
+      <hr />
+      <h4>End note</h4>
+      <p>
+        I'll leave you with this plea. Please fall in love with something.
+        Please pursue an art form, find the upper bounds of your abilities, fall
+        in love with the world and everything everyone's created, and work
+        tirelessly to the point of insanity to create something, anything, that
+        when someone looks at, they also fall in love. This world that we exist
+        in exists for one reason and one reason only, it's because there were
+        people out there who loved something so much that
+        <a href="https://youtu.be/p-AiTHogbcc"
+          >they wanted others to experience that same love in their hearts.</a
+        >
+      </p>
+      <p>=================================</p>
+    </div>
+
+    <div class="blank-notice">
+      <br /><span class="symbol-group">○</span>零<br />THIS SPACE <br />
+      INTENTIONALLY <br />LEFT BLANK<br /><span class="symbol-group">○</span>零
+    </div>
+
+    <div class="video-container">
+      <video controls>
+        <source src="./videos/yugo.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </body>
+</html>
