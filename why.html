@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Avenir, sans-serif;
+        color: white;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        min-height: 100vh;
+        overflow-x: hidden;
+        background-color: black;
+      }
+
+      body::-webkit-scrollbar {
+        display: none;
+      }
+      html {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        position: relative;
+      }
+
+      .random-media {
+        position: absolute;
+        max-width: 300px;
+        max-height: 250px;
+        object-fit: contain;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        border-radius: 12px;
+        transition: all 0.5s ease;
+        cursor: pointer;
+        opacity: 0; /* Start hidden */
+      }
+      
+      .random-media:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        z-index: 100;
+        transform: scale(1.05);
+      }
+      
+      /* Dialog styles for modal view */
+      dialog {
+        padding: 0;
+        border: none;
+        border-radius: 12px;
+        background-color: transparent;
+        max-width: 80vw;
+        max-height: 80vh;
+        margin: auto;
+        overflow: visible;
+      }
+      
+      dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.9);
+        transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+      }
+      
+      dialog img, dialog video {
+        max-width: 80vw;
+        max-height: 80vh;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        transform-origin: center;
+        animation: modal-zoom-in 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      }
+      
+      dialog video {
+        display: block;
+      }
+      
+      @keyframes modal-zoom-in {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      
+      .modal-closing {
+        animation: modal-zoom-out 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      }
+      
+      @keyframes modal-zoom-out {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+      }
+      
+      #featured-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 500px;
+        max-height: 400px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        border-radius: 12px;
+        transition: all 0.5s ease;
+        z-index: 50;
+        cursor: pointer;
+      }
+      
+      #featured-video:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        transform: translate(-50%, -50%) scale(1.05);
+      }
+      
+      .container {
+        position: relative;
+        z-index: 10;
+        padding: 20px;
+        text-align: center;
+      }
+      
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 30px;
+      }
+      
+      #media-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        overflow: visible;
+      }
+      
+      .show-all .random-media {
+        opacity: 1;
+      }
+      
+      /* Make sure media elements are always visible */
+      .random-media {
+        transform: translate3d(0, 0, 0); /* Force GPU acceleration */
+        will-change: opacity, transform; /* Optimize animations */
+      }
+      
+      /* Style for the bottom right text box */
+      .bottom-right-text {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-weight: 300;
+        border-radius: 8px;
+        z-index: 10;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        font-family: Avenir, sans-serif;
+        font-size: 16px;
+        letter-spacing: 1px;
+      }
+    </style>
+  </head>
+  <body>
+   
+    
+    <div id="media-container">
+      <video id="featured-video" loop controls playsinline muted>
+        <source src="images/why/human.MP4" type="video/mp4">
+        <source src="images/why/human.MP4" type="video/quicktime">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    
+    <!-- Bottom right text box -->
+    <p class="bottom-right-text">why.html</p>
+    
+    <!-- Modal dialog for displaying clicked media -->
+    <dialog id="media-modal">
+      <!-- Content will be added dynamically -->
+    </dialog>
+
+    <script>
+      // List of all media files in the why folder (excluding human.MP4 which is our featured video)
+      const mediaFiles = [
+        '1.png',
+        '2.jpeg',
+        'IMG_6194.jpg',
+        'IMG_6195.jpg',
+        'IMG_6196.jpg',
+        'IMG_6199.jpg',
+        'IMG_6200.jpg',
+        'IMG_6201.jpg',
+        'IMG_6202.jpg',
+        'export_1746396480508.MOV',
+        'v09044g40000culvgkvog65h43mll6i0.MP4',
+        'v09044g40000cv5de4fog65pio1kv6c0.MP4',
+        'v09044g40000cvja05fog65gpr3srg70.MP4',
+        'v0f044gc0000co3gd9fog65ti18gk15g.MP4',
+        'v0f044gc0000cukgqqnog65gijvv1nag.MP4',
+        'v12044gd0000ctjkro7og65nf12u0khg.MP4',
+        'v12044gd0000cuqbpbvog65h8grs12dg.MP4',
+        'v12044gd0000cuv8if7og65mllj2m350.MP4',
+        'v12044gd0000cv7p207og65g05lk8t10.MP4',
+        'v12044gd0000cv8i037og65pdujqnbo0.MP4',
+        'v12044gd0000cve9v77og65i530osh5g.MP4',
+        'v12044gd0000cvm7ccvog65us6u91ttg.MP4',
+        'v12044gd0000cvrcei7og65lu2rtvq4g.MP4',
+        'v12044gd0000cvss0sfog65h4juspvag.MP4',
+        'v12044gd0000cvv6ncvog65vvpobjdj0.MP4',
+        'v12044gd0000d08l9pfog65r89mm0a20.MP4',
+        'v14044g50000cus16ofog65s23v4eh7g.MP4',
+        'v14044g50000cuvmfunog65jq3qfff1g.MP4',
+        'v15025gf0000cuuuhtnog65sph6cg7k0.MP4',
+        'v15044gf0000ctni57vog65iro5g07t0.MP4',
+        'v15044gf0000cv0iovnog65sos1b5n80.MP4',
+        'v15044gf0000cv4e2efog65p2h0th800.MP4',
+        'v15044gf0000d06ej2fog65q78ju7fjg.MP4',
+        'v24044gl0000ct1odk7og65qje5dd6kg.mov',
+        'v24044gl0000cut240vog65obfvl5kug.MP4',
+        'v24044gl0000cve6ctvog65ko7t4r2hg.MP4',
+        'v24044gl0000cvercn7og65lqh4k282g.MP4',
+        'v24044gl0000cvv6gknog65t06plkabg.MP4'
+      ];
+
+      // Shuffle the array to randomize the order
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      // Check if two rectangles overlap
+      function checkOverlap(rect1, rect2) {
+        return !(rect1.right < rect2.left || 
+                rect1.left > rect2.right || 
+                rect1.bottom < rect2.top || 
+                rect1.top > rect2.bottom);
+      }
+
+      // Find a position for the media element that avoids only the center element
+      function findNonOverlappingPosition(width, height, existingElements) {
+        // Get viewport dimensions
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Get the featured video element (should be the first element in existingElements)
+        const featuredVideo = existingElements[0];
+        const featuredRect = featuredVideo.getBoundingClientRect();
+        
+        // Define the center area to avoid
+        const centerRect = {
+          left: featuredRect.left - 20,
+          top: featuredRect.top - 20,
+          right: featuredRect.right + 20,
+          bottom: featuredRect.bottom + 20
+        };
+        
+        // Generate random position within the viewport
+        let left, top;
+        let attempts = 0;
+        const maxAttempts = 20; // Fewer attempts since we're allowing overlap
+        
+        while (attempts < maxAttempts) {
+          // Generate random position
+          left = Math.random() * (viewportWidth - width);
+          top = Math.random() * (viewportHeight - height);
+          
+          // Check if it overlaps with the center element
+          const newRect = {
+            left: left,
+            top: top,
+            right: left + width,
+            bottom: top + height
+          };
+          
+          if (!checkOverlap(newRect, centerRect)) {
+            return { left, top };
+          }
+          
+          attempts++;
+        }
+        
+        // If we couldn't find a non-overlapping position, place it randomly outside the viewport
+        // but still close enough to be visible with scrolling
+        const randomEdge = Math.floor(Math.random() * 4);
+        
+        switch(randomEdge) {
+          case 0: // Top
+            left = Math.random() * viewportWidth;
+            top = -height * Math.random();
+            break;
+          case 1: // Right
+            left = viewportWidth + Math.random() * 100;
+            top = Math.random() * viewportHeight;
+            break;
+          case 2: // Bottom
+            left = Math.random() * viewportWidth;
+            top = viewportHeight + Math.random() * 100;
+            break;
+          case 3: // Left
+            left = -width * Math.random();
+            top = Math.random() * viewportHeight;
+            break;
+        }
+        
+        return { left, top };
+      }
+
+      // Create and place media elements - this will only be called when the video is played
+      function placeMediaElements() {
+        const container = document.getElementById('media-container');
+        const featuredVideo = document.getElementById('featured-video');
+        
+        // First, remove any existing random media elements
+        const existingRandomMedia = document.querySelectorAll('.random-media');
+        existingRandomMedia.forEach(el => el.remove());
+        
+        // Keep the featured video
+        const shuffledMedia = shuffleArray([...mediaFiles]);
+        const existingElements = [featuredVideo]; // Start with the featured video as an existing element
+        const basePath = 'images/why/';
+        
+        // Place all media elements
+        for (let i = 0; i < shuffledMedia.length; i++) {
+          const file = shuffledMedia[i];
+          const isVideo = /\.(mp4|mov)$/i.test(file);
+          
+          let element;
+          if (isVideo) {
+            element = document.createElement('video');
+            element.controls = true;
+            element.muted = true;
+            element.loop = true;
+            
+            // Add source
+            const source = document.createElement('source');
+            source.src = basePath + file;
+            source.type = file.toLowerCase().endsWith('mp4') ? 'video/mp4' : 'video/quicktime';
+            element.appendChild(source);
+          } else {
+            element = document.createElement('img');
+            element.src = basePath + file;
+            element.alt = 'Random media';
+          }
+          
+          element.className = 'random-media';
+          element.style.opacity = '0'; // Start hidden
+          container.appendChild(element);
+          
+          // Use default dimensions
+          const defaultWidth = 180;
+          const defaultHeight = 130;
+          
+          // Find position that doesn't overlap
+          const position = findNonOverlappingPosition(defaultWidth, defaultHeight, existingElements);
+          
+          // Set position
+          element.style.left = position.left + 'px';
+          element.style.top = position.top + 'px';
+          
+          // Randomize size slightly
+          const sizeVariation = 0.7 + Math.random() * 0.6; // 70% to 130% of original size
+          element.style.maxWidth = (defaultWidth * sizeVariation) + 'px';
+          element.style.maxHeight = (defaultHeight * sizeVariation) + 'px';
+          
+          // Add to existing elements for overlap checking
+          existingElements.push(element);
+          
+          // For videos, play on hover
+          if (isVideo) {
+            element.addEventListener('mouseenter', () => {
+              element.play();
+            });
+            element.addEventListener('mouseleave', () => {
+              element.pause();
+            });
+          }
+          
+          // Add click event to show in modal with animation
+          element.addEventListener('click', () => {
+            showMediaInModal(element.cloneNode(true), element);
+          });
+        }
+      }
+      
+      // Set up the featured video behavior
+      function setupFeaturedVideo() {
+        const featuredVideo = document.getElementById('featured-video');
+        const container = document.getElementById('media-container');
+        let allMediaVisible = false;
+        let mediaElementsPlaced = false;
+        
+        // Function to place and show all media elements
+        const showAllMedia = () => {
+          // First place the media elements if they haven't been placed yet
+          if (!mediaElementsPlaced) {
+            placeMediaElements();
+            mediaElementsPlaced = true;
+          }
+          
+          // Then make them visible with a staggered animation
+          if (!allMediaVisible) {
+            const mediaElements = document.querySelectorAll('.random-media');
+            mediaElements.forEach((element, index) => {
+              console.log("showing media element");
+              setTimeout(() => {
+                element.style.opacity = '1';
+              }, 100 + index * 20); // Faster stagger for more elements
+            });
+            allMediaVisible = true;
+            
+            // Add class to container to mark all media as shown
+            container.classList.add('show-all');
+          }
+        };
+        
+        // Safari-compatible play handling
+        function attemptPlay() {
+          // First unmute the video - this must happen before play() is called
+          featuredVideo.muted = false;
+          featuredVideo.volume = 1.0; // Ensure volume is up
+          
+          // Try to play and handle any errors
+          const playPromise = featuredVideo.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              // Video playback started successfully
+              // Double-check that it's unmuted after playback starts
+              setTimeout(() => {
+                featuredVideo.muted = false;
+                featuredVideo.volume = 1.0;
+              }, 100);
+              
+              showAllMedia();
+            })
+            .catch(error => {
+              // Auto-play was prevented or another error occurred
+              console.log("Video play error:", error);
+              
+              // For Safari, we might need user interaction
+              featuredVideo.controls = true;
+            });
+          }
+        }
+        
+        // Only show media when the video plays
+        featuredVideo.addEventListener('play', () => {
+          // Ensure video is unmuted when it starts playing
+          featuredVideo.muted = false;
+          featuredVideo.volume = 1.0;
+          showAllMedia();
+        });
+        
+        // Click to toggle play/pause with Safari compatibility
+        featuredVideo.addEventListener('click', () => {
+          if (featuredVideo.paused) {
+            attemptPlay();
+          } else {
+            featuredVideo.pause();
+          }
+        });
+        
+        // Add additional interaction events for Safari
+        featuredVideo.addEventListener('touchstart', () => {
+          if (featuredVideo.paused) {
+            attemptPlay();
+          }
+        }, { passive: true });
+        
+        // Additional event listener for the play button click
+        featuredVideo.addEventListener('playing', () => {
+          // Ensure video is unmuted when it's actually playing
+          featuredVideo.muted = false;
+          featuredVideo.volume = 1.0;
+        });
+        
+        // Remove autoplay behavior - we want explicit user interaction
+        featuredVideo.autoplay = false;
+      }
+
+      // Function to show media in modal dialog with animation
+      function showMediaInModal(mediaElement, sourceElement) {
+        const modal = document.getElementById('media-modal');
+        
+        // Clear previous content
+        modal.innerHTML = '';
+        
+        // Create a container for the media to allow for positioning
+        const mediaContainer = document.createElement('div');
+        mediaContainer.style.position = 'relative';
+        mediaContainer.style.width = '100%';
+        mediaContainer.style.height = '100%';
+        mediaContainer.style.display = 'flex';
+        mediaContainer.style.justifyContent = 'center';
+        mediaContainer.style.alignItems = 'center';
+        
+        // Add the media element to the container
+        mediaElement.removeAttribute('style'); // Remove all inline styles
+        mediaElement.classList.remove('random-media');
+        
+        // If it's a video, make sure it plays automatically and has controls
+        if (mediaElement.tagName.toLowerCase() === 'video') {
+          mediaElement.controls = true;
+          mediaElement.autoplay = true;
+          mediaElement.muted = false;
+        }
+        
+        mediaContainer.appendChild(mediaElement);
+        modal.appendChild(mediaContainer);
+        
+        // Add close button
+        const closeButton = document.createElement('button');
+        closeButton.textContent = '×';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.style.background = 'rgba(0, 0, 0, 0.5)';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '50%';
+        closeButton.style.width = '30px';
+        closeButton.style.height = '30px';
+        closeButton.style.fontSize = '20px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.zIndex = '1000';
+        closeButton.style.opacity = '0';
+        closeButton.style.transition = 'opacity 0.3s ease 0.5s'; // Delay appearance
+        
+        // Animate the close button appearance
+        setTimeout(() => {
+          closeButton.style.opacity = '1';
+        }, 300);
+        
+        mediaContainer.appendChild(closeButton);
+        
+        // Show the modal
+        modal.showModal();
+        
+        // Function to handle modal closing with muting videos
+        const closeModalWithAnimation = () => {
+          const mediaEl = modal.querySelector('img, video');
+          if (mediaEl) {
+            // If it's a video, mute it
+            if (mediaEl.tagName.toLowerCase() === 'video') {
+              mediaEl.muted = true;
+              mediaEl.volume = 0; // Ensure it's muted
+            }
+            
+            mediaEl.classList.add('modal-closing');
+            // Wait for animation to complete before closing
+            setTimeout(() => {
+              modal.close();
+            }, 400);
+          } else {
+            modal.close();
+          }
+        };
+        
+        // Add closing animation
+        closeButton.onclick = closeModalWithAnimation;
+        
+        // Close modal when clicking outside with animation
+        modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            closeModalWithAnimation();
+          }
+        });
+        
+        // Also handle the modal's close event
+        modal.addEventListener('close', () => {
+          const videoEl = modal.querySelector('video');
+          if (videoEl) {
+            videoEl.muted = true;
+            videoEl.pause();
+          }
+        });
+      }
+      
+      // Initialize everything when the page loads
+      window.addEventListener('load', () => {
+        // Only set up the featured video - other media will be placed when video plays
+        setupFeaturedVideo();
+      });
+      
+      // Reposition on window resize
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          // Clear and rebuild the media elements (except featured video)
+          const container = document.getElementById('media-container');
+          const mediaElements = document.querySelectorAll('.random-media');
+          mediaElements.forEach(element => element.remove());
+          placeMediaElements();
+          
+          // If media was already visible, show the new elements immediately
+          if (container.classList.contains('show-all')) {
+            document.querySelectorAll('.random-media').forEach(element => {
+              element.style.opacity = '1';
+            });
+          }
+        }, 300);
+      });
+    </script>
+  </body>
+</html>
